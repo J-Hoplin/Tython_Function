@@ -1,0 +1,6 @@
+#OS
+.DS_STORE
+#Pycache
+__pycache__/
+#testingscript
+test.py
