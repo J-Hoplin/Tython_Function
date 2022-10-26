@@ -8,8 +8,8 @@ class ArgumentsNotDefined(Exception):
 '''
 
 class KwargsParameterUnmatchedException(Exception):
-    def __init__(self,functionname):
-        super().__init__(f"Some keys defined in decorator are not in parameter list of function {functionname}")
+    def __init__(self,functionname,lostcount):
+        super().__init__(f"Some keys defined in decorator are not in parameter list of function '{functionname}' : missing {lostcount} arguments")
 
 class KwargsIntegrityBrokenException(Exception):
     '''
@@ -75,4 +75,4 @@ class ValidatorTypeInvalid(Exception):
 
 class VardictArgmentNotDefined(Exception):
     def __init__(self,argname,functionname):
-        super().__init__(f"Variadic argument type '{argname}' not declared but give as input in function ({functionname})")
+        super().__init__(f"Variadic argument type '{argname}' not declared but give as input in function '{functionname}'")

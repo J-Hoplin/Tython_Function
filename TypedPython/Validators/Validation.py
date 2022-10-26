@@ -2,6 +2,10 @@ import inspect,abc
 from TypedPython.Exceptions.Exceptions import ParameterTypeUnmatchedException
 
 class Validation(object):
+
+    def __init__(self):
+        self.parameter_Preprocess = dict()
+
     def validation(self,validationbucket):
         for require, value in validationbucket:
             # For multiple type utilities (ex : Union)
