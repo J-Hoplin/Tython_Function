@@ -1,5 +1,6 @@
-import inspect,collections,abc
+import inspect
 from typing import Any
+from collections import Counter
 from TypedPython.Modes.mode import Mode
 from TypedPython.Validators.Validation import Validation
 from TypedPython.Exceptions.Exceptions import *
@@ -18,14 +19,14 @@ class NormalValidator(Validation):
 
         # If type args
         if self.validationTypes:
-            self.type = 'args'
+            self.type = Mode.TYPE_ARGS
 
         # If type kwargs
         elif self.individualTypes.keys():
-            self.type = 'kwargs'
+            self.type = Mode.TYPE_KWARGS
         # If not -> None
         else:
-            self.type = 'none'
+            self.type = Mode.TYPE_NONE
 
 
     def __call__(self, function):
@@ -46,7 +47,8 @@ class NormalValidator(Validation):
             #Checkable parameters
             parameter_info = inspect.signature(function)
             # 딕셔너리에 대해 순회를 돌면 기본적으로 키값을 반환하는 성질 활용
-            #함수의 매개변수 목록들 추출
+
+            # Get list of function parameter list
             function_arguments = list(
                 filter(
                     lambda x: x not in argkwg_filter,
@@ -55,20 +57,26 @@ class NormalValidator(Validation):
                             lambda x: x,
                             list(
                                 parameter_info.parameters)))))
+
+            function_arguments = function_arguments if not self.isMethod else function_arguments[1:]
             # get parameter list with default value
             nullable_param = self.getParameterListWithDefaultDictionary(parameter_info)
             # get parameter that is required
             not_nullable_param = list(set(function_arguments).difference(set(nullable_param)))
-            # for if it's instance
-            instance = None
             # Slice index : to seperate kwargs check range
             slice_index = None
             # Copy args for checking
-            args_cpy = args[:]
-            # Case if it's class
-            if self.isMethod:
-                instance = args_cpy[0]
-                args_cpy = args_cpy[1:]
+            args_cpy = args[:] if not self.isMethod else args[1:]
+            # for if it's instance
+            instance = None if not self.isMethod else args[0]
+
+            # Deprecate Afterward
+            # # Case if it's class
+            # if self.isMethod:
+            #     instance = args_cpy[0]
+            #     args_cpy = args_cpy[1:]
+            #     function_arguments = function_arguments[1:]
+
             '''
             ///////////////////////////
             function data preprocessing
@@ -134,13 +142,13 @@ class NormalValidator(Validation):
 
 
             def type_Args():
-                '''
-                //// check args type parameters ////
-                '''
-                # Some arguments in kwargs
+                # Some arguments given as kwargs
                 kwargs_key_in_parameter = list(
                     filter(
                         lambda x: x in function_arguments, kwargs.keys()))
+                '''
+                //// check args type parameters ////
+                '''
                 # If strict mode
                 if self.strictCheck:
                     # If length of function argument, validationtype valued length different
@@ -153,15 +161,15 @@ class NormalValidator(Validation):
                     params = function_arguments[:]
                     # if args give much more than normal function argument
                     if len(args_cpy) > len(function_arguments):
-                        #params = params[:len(function_arguments)]
-                        validation_capsule = list(zip(self.validationTypes,params))
+                        # params = params[:len(function_arguments)]
+                        validation_capsule = list(zip(self.validationTypes,args_cpy[:len(function_arguments)]))
+                        print(validation_capsule)
                     else:
                         #params = params[:len(function_arguments)]
                         # args type type validate capsule builder
                         # < Decide Validation >
                         validation_capsule.extend(list(zip(self.validationTypes[:len(args_cpy)],args_cpy)))
                         # Filter index of parameter
-
                         # kwargs type validate capsule builder
                         # value : [key,index of key]
                         getIndexOfKwargsParameter = list(
@@ -196,7 +204,9 @@ class NormalValidator(Validation):
 
                     # Function parameter list that should be check : instead of function_argument
                     valid_function_param = function_arguments[:len(self.validationTypes)]
-                    kwargs_key_in_parameter = list(filter(lambda x: x in valid_function_param,kwargs_key_in_parameter))
+                    kwargs_key_in_parameter = list(
+                        filter(
+                            lambda x: x in valid_function_param,kwargs_key_in_parameter))
                     # < Decide Validation >
                     # Copy in lentgth of defined validation
                     range_args_cpy = args_cpy[:len(self.validationTypes)]
@@ -231,7 +241,80 @@ class NormalValidator(Validation):
 
 
             def type_Kwargs():
-                validateVardictArgumentDefinition()
+                # Validate key integration
+                for i in self.individualTypes.keys():
+                    if i not in function_arguments:
+                        raise KwargsIntegrityBrokenException(function.__name__,i)
+
+                # Some arguments in kwargs
+                kwargs_key_in_parameter = list(
+                    filter(
+                        lambda x: x in function_arguments, kwargs.keys()))
+
+                # If strict mode
+                if self.strictCheck:
+                    # if decorator defined key and function argument not matched
+                    if not (Counter(self.individualTypes.keys()) == Counter(function_arguments)):
+                        raise KwargsParameterUnmatchedException(function.__name__)
+
+                    # Convert dictionary type defined to sequence type for order vouch
+                    iterativeDefine = list(
+                        map(
+                            lambda x: self.individualTypes[x], function_arguments))
+
+                    # Validation Capsule
+                    validation_capsule = list()
+
+                    # Parameter lists
+                    params = function_arguments[:]
+
+                    # < Decide Validation >
+                    # If argument count is longer than function argument
+                    if len(args_cpy) > len(function_arguments):
+                        validation_capsule = list(zip(iterativeDefine,args_cpy[:len(function_arguments)]))
+                    # If argument count is shorter than function argument
+                    else:
+                        validation_capsule.extend(list(zip(iterativeDefine[:args_cpy],args_cpy)))
+                        getIndexOfKwargsParameter = list(
+                            map(
+                                lambda x: [x,function_arguments.index(x)],kwargs_key_in_parameter))
+
+                        for key,index in getIndexOfKwargsParameter:
+                            validation_capsule.append([iterativeDefine[index],kwargs[key]])
+
+                        # Make smaller scope of validation : except args
+                        params = params[len(args_cpy):]
+
+                        # Check if parameter exist as key in kwargs
+                        params = list(
+                            filter(
+                                lambda x: x not in kwargs_key_in_parameter, params))
+                        # Check if parameter is nullable type(having default value)
+                        params = list(
+                            filter(
+                                lambda x: x not in nullable_param, params))
+                        # If some attribute left -> some value not typed
+                        if params:
+                            raise UnableToCheckRequiredFieldException(self.modename, function.__name__)
+                    validateVardictArgumentDefinition()
+                    self.validation(validation_capsule)
+
+                # If not strict mode
+                else:
+                    validation_capsule = list()
+                    convertKeyWithIndex = dict(
+                        map(
+                            lambda x:(x,[self.individualTypes[x],function_arguments.index(x)]),self.individualTypes.keys()))
+
+                    #filter kwargs ket in parameter only decorator defined
+                    kwargs_key_in_parameter = list(
+                        filter(
+                            lambda x:x in self.individualTypes.keys(),kwargs_key_in_parameter))
+
+
+
+
+                    validateVardictArgumentDefinition()
                 '''
                 //// check kwargs type parameters  ////
                 '''
@@ -245,40 +328,6 @@ class NormalValidator(Validation):
             by_type[self.type]()
 
             return function(instance, *args, **kwargs) if self.isMethod else function(*args, **kwargs)
-            # slice_index = len(args_cpy)
-            # # If length of args checking range is more than self.validationtypes
-            # if len(self.validationTypes) < len(args_cpy):
-            #     check_in_kwargs = function_arguments[len(args_cpy) - len(self.validationTypes): len(args_cpy)]
-            #     print(check_in_kwargs)
-            #
-            # # Make validation : Args
-            # self.validation(zip(self.validationTypes[:slice_index], args_cpy[:slice_index]))
-            # '''
-            # //// check kwargs type parameters  ////
-            # '''
-            # # Remain field to check
-            # function_arguments = function_arguments[slice_index:]
-            # # Capsule list for validation : list[type,value]
-            # validation_capsule = []
-            # # Loop : arguemnt list which require to check type
-            # for i in function_arguments:
-            #     # If key not in kwargs field
-            #     if i not in kwargs.keys():
-            #         # Not in kwags field but in group of parameter which has default value -> pass
-            #         # Don't make any checking task about parameter with default value
-            #         if i in nullable_param:
-            #             print(nullable_param)
-            #             continue
-            #         # If parameter not in both group -> Make exception
-            #         raise KwargsIntegrityBrokenException(function.__name__,i)
-            #     # Build validation capsule
-            #     try:
-            #         validation_capsule.append([self.individualTypes[i],kwargs[i]])
-            #     except KeyError:
-            #         raise KwargsUndefinedException()
-            # print(validation_capsule)
-            # # Make a validation : kwargs
-            # self.validation(validation_capsule)
         return wrapper
 
 

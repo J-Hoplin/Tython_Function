@@ -7,6 +7,10 @@ class ArgumentsNotDefined(Exception):
 //// kwargs ////
 '''
 
+class KwargsParameterUnmatchedException(Exception):
+    def __init__(self,functionname):
+        super().__init__(f"Some keys defined in decorator are not in parameter list of function {functionname}")
+
 class KwargsIntegrityBrokenException(Exception):
     '''
     Exception while : TypeValidation
