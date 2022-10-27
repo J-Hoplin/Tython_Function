@@ -9,10 +9,11 @@ Python version 3.7 이상이 권장됩니다.
 ***
 ## License Information
 
+<img src="https://opensource.org/files/OSIApproved_1.png" width=75 height=100 align="right" alt="opensource icon">
+
 - [MIT License](https://opensource.org/licenses/MIT)
-
-<img src="https://opensource.org/files/OSIApproved_1.png" width=75 height=100 alt="opensource icon">
-
+- Copyright by Hoplin
+- Tython Function : Tython Function / Method is Python Decorator for validating parameter input type
 ***
 ## Basic Usage - Function
 
