@@ -1,12 +1,19 @@
 Tython Function
 ===
 ***
-**Tython Function**은 Python의 `Function` 혹은 `Method` Parameter에 대해 Type을 validation 해주는 `Decorator`입니다.
-
+**Tython Function**은 Python의 `Function` 혹은 `Method` Parameter에 대해 Type을 validation 해주는 `Decorator`입니다.앞으로 구현해볼 `Typed Python`에서 함수 부분의 Type Binding 로직입니다.
 - 데코레이터가 무엇인지 모르시나요? 아래 링크를 참고해주세요(Don't know about python decorator? Please refer link under below)
     - https://peps.python.org/pep-0318/
-***
 
+Python version 3.7 이상이 권장됩니다.
+***
+## License Information
+
+- [MIT License](https://opensource.org/licenses/MIT)
+
+<img src="https://opensource.org/files/OSIApproved_1.png" width=75 height=100 alt="opensource icon">
+
+***
 ## Basic Usage - Function
 
 1. Clone project
