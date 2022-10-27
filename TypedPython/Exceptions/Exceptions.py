@@ -78,7 +78,7 @@ class ValidatorTypeInvalid(Exception):
     For parameter type unmatched
     '''
     def __init__(self):
-        super().__init__("Unable to judge validator type. Please use iterative type or hashable type")
+        super().__init__("Unable to judge validator type. Please use 'Sequence' type or 'Key-Value'")
 
 class VardictArgmentNotDefined(Exception):
     def __init__(self,argname,functionname):

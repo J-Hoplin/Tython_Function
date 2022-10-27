@@ -1,5 +1,4 @@
 import inspect
-from typing import Any
 from collections import Counter
 from TypedPython.Modes.mode import Mode
 from TypedPython.Modes.field import Field
@@ -65,9 +64,11 @@ class ParameterValidator(Validation):
             nullable_param = self.getParameterListWithDefaultDictionary(parameter_info)
             # get parameter that is required
             not_nullable_param = list(set(function_arguments).difference(set(nullable_param)))
-            # If it's method remove 'self' from not nullable param
-            if not self.isMethod:
-                not_nullable_param.remove(function_arguments[0])
+            # # If it's method remove 'self' from not nullable param
+
+            # if self.isMethod:
+            #     not_nullable_param.remove(function_arguments[0])
+
             # Slice index : to seperate kwargs check range
             slice_index = None
             # Copy args for checking
@@ -102,7 +103,10 @@ class ParameterValidator(Validation):
                 if self.strictCheck:
                     # If types defined in decorator not match with function parameter
                     if not (Counter(self.individualTypes.keys()) == Counter(function_arguments)):
-                        raise KwargsParameterUnmatchedException(function.__name__,len())
+                        raise KwargsParameterUnmatchedException(function.__name__,len(
+                            list(
+                                filter(
+                                    lambda x: x not in self.individualTypes.keys(),function_arguments))))
 
 
             # Deprecate Afterward
@@ -130,7 +134,7 @@ class ParameterValidator(Validation):
                     try:
                         capsule[Field.TYPE] = self.individualTypes[v]
                     except KeyError:
-                        capsule[Field.TYPE] = object
+                        continue
                 self.parameter_Preprocess[v] = capsule
 
 
@@ -159,9 +163,6 @@ class ParameterValidator(Validation):
                     raise VardictArgmentNotDefined('kwargs', function.__name__)
 
             def type_none():
-                # If field with not nullable exist
-                if not_nullable_param:
-                    raise ArgumentsNotDefined(function.__name__, not_nullable_param)
                 validateVardictArgumentDefinition()
                 if self._level == Mode.DEBUG:
                     if not_nullable_param:
@@ -324,5 +325,3 @@ class ParameterValidator(Validation):
             by_type[self.type]()
             return function(*args, **kwargs)
         return wrapper
-
-
