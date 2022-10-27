@@ -1,6 +1,11 @@
 class Mode:
     '''
-    //// MODE ////
+    //// Validator Outer Mode ////
+    '''
+    DEBUG='debug'
+    PRODUCTION='production'
+    '''
+    //// Validator Inner MODE ////
     '''
     STRICT='Strict mode'
     NON_STRICT='Non strict mode'

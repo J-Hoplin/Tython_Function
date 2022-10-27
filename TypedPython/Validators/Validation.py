@@ -1,10 +1,23 @@
 import inspect,abc
-from TypedPython.Exceptions.Exceptions import ParameterTypeUnmatchedException
+from TypedPython.Exceptions.Exceptions import ParameterTypeUnmatchedException,ConfigurationOptionNotSupported
+from TypedPython.Modes.mode import Mode
 
 class Validation(object):
+    _level = Mode.DEBUG
 
     def __init__(self):
         self.parameter_Preprocess = dict()
+
+    @classmethod
+    def config(cls,mode):
+        if mode.lower() == Mode.DEBUG:
+            Validation._level = Mode.DEBUG
+            return
+        if mode.lower() == Mode.PRODUCTION:
+            Validation._level = Mode.PRODUCTION
+            return
+        raise ConfigurationOptionNotSupported(mode.lower())
+
 
     def validation(self,validationbucket):
         for require, value in validationbucket:

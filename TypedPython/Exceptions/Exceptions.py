@@ -1,7 +1,14 @@
+from TypedPython.Modes.mode import Mode
+
 class ArgumentsNotDefined(Exception):
 
     def __init__(self,functionname:str,arguments:list):
         super().__init__(f"Some arguments are required in funtion '{functionname}' : {','.join(arguments)}")
+
+class ConfigurationOptionNotSupported(Exception):
+    __ConfigLists = [Mode.DEBUG,Mode.PRODUCTION]
+    def __init__(self,option):
+        super().__init__(f"Configuration option '{option}' not supported\n- Supported types : {', '.join(ConfigurationOptionNotSupported.__ConfigLists)}\n- Debug : Print warning / success message at console\n- Production : Do not print any warning / success message at console")
 
 '''
 //// kwargs ////

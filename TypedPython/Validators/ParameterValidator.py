@@ -1,10 +1,11 @@
 import inspect
 from typing import Any
-from collections import Counter, OrderedDict
+from collections import Counter
 from TypedPython.Modes.mode import Mode
 from TypedPython.Modes.field import Field
 from TypedPython.Validators.Validation import Validation
 from TypedPython.Exceptions.Exceptions import *
+from TypedPython.Modes.MSGS import MSGS
 
 class ParameterValidator(Validation):
     def __init__(self, *args, strictCheck: bool = True, isTypeMethod=False, **kwargs):
@@ -29,7 +30,6 @@ class ParameterValidator(Validation):
         # If not -> None
         else:
             self.type = Mode.TYPE_NONE
-
 
     def __call__(self, function):
         def wrapper(*args,**kwargs):
@@ -63,7 +63,6 @@ class ParameterValidator(Validation):
             function_arguments = function_arguments if not self.isMethod else function_arguments[1:]
             # get parameter list with default value
             nullable_param = self.getParameterListWithDefaultDictionary(parameter_info)
-            print(nullable_param)
             # get parameter that is required
             not_nullable_param = list(set(function_arguments).difference(set(nullable_param)))
             # If it's method remove 'self' from not nullable param
@@ -134,8 +133,6 @@ class ParameterValidator(Validation):
                         capsule[Field.TYPE] = object
                 self.parameter_Preprocess[v] = capsule
 
-            print(self.parameter_Preprocess)
-
 
             '''
             /////////////////////////
@@ -162,12 +159,15 @@ class ParameterValidator(Validation):
                     raise VardictArgmentNotDefined('kwargs', function.__name__)
 
             def type_none():
-                print(not_nullable_param)
                 # If field with not nullable exist
                 if not_nullable_param:
                     raise ArgumentsNotDefined(function.__name__, not_nullable_param)
                 validateVardictArgumentDefinition()
-
+                if self._level == Mode.DEBUG:
+                    if not_nullable_param:
+                        MSGS.warning_nonsafe(function.__name__,len(not_nullable_param),len(not_nullable_param))
+                    else:
+                        MSGS.success_successmsg(function.__name__)
 
             def type_Args():
 
@@ -187,12 +187,9 @@ class ParameterValidator(Validation):
                     if len(args_cpy) >= len(function_arguments):
                         # params = params[:len(function_arguments)]
                         validation_capsule = list(zip(self.validationTypes,args_cpy[:len(function_arguments)]))
-                        print(validation_capsule)
                     else:
                         if (len(kwargs_key_in_parameter) + len(args_cpy)) != len(function_arguments):
                             # Check if not given values is nullable field
-                            print(args_cpy)
-                            print(nullable_param)
                             if Counter(function_arguments[(len(args_cpy) + len(kwargs_key_in_parameter)):]) != Counter(nullable_param):
                                 raise UnableToCheckRequiredFieldException(self.modename, function.__name__)
 
@@ -243,6 +240,19 @@ class ParameterValidator(Validation):
                 validateVardictArgumentDefinition()
                 self.validation(validation_capsule)
 
+                if self._level == Mode.DEBUG:
+                    if self.strictCheck:
+                        MSGS.success_successmsg(function.__name__)
+                    else:
+                        # Get count of not nullable but not checking
+                        not_nullable_but_not_checked = list(
+                            filter(
+                                lambda x: x not in valid_function_param,not_nullable_param))
+                        if not not_nullable_but_not_checked:
+                            MSGS.success_successmsg(function.__name__)
+                        else:
+                            MSGS.warning_nonsafe(function.__name__,len(not_nullable_param),len(not_nullable_but_not_checked))
+
             def type_Kwargs():
                 # Get field list of parameter that exist in kwargs
                 kwargs_key_in_parameter = list(
@@ -287,10 +297,22 @@ class ParameterValidator(Validation):
                             validation_capsule.append([self.parameter_Preprocess[k][Field.TYPE],range_args_cpy[self.parameter_Preprocess[k][Field.INDEX]]])
                         else:
                             validation_capsule.append([self.parameter_Preprocess[k][Field.TYPE],kwargs[k]])
-                    print(validation_capsule)
 
                 validateVardictArgumentDefinition()
                 self.validation(validation_capsule)
+
+                if self._level == Mode.DEBUG:
+                    if self.strictCheck:
+                        MSGS.success_successmsg(function.__name__)
+                    else:
+                        not_nullable_but_not_checked = list(
+                            filter(
+                                lambda x: x not in self.parameter_Preprocess.keys(),not_nullable_param))
+                        if not not_nullable_but_not_checked:
+                            MSGS.success_successmsg(function.__name__)
+                        else:
+                            MSGS.warning_nonsafe(function.__name__, len(not_nullable_param),len(not_nullable_but_not_checked))
+
                 '''
                 //// check kwargs type parameters  ////
                 '''
