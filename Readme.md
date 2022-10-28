@@ -216,3 +216,8 @@ class example_class(object):
 ec = example_class()
 ec.example_method(10,Person('hoplin'),50)
 ```
+***
+
+## Test Case Result
+
+![image](https://user-images.githubusercontent.com/45956041/198455932-3df0e1d5-2002-45a0-82d4-5490e7718449.png)
