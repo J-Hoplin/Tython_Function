@@ -23,16 +23,16 @@ class KwargsIntegrityBrokenException(Exception):
     Exception while : TypeValidation
     For kwargs key not in funciton args
     '''
-    def __init__(self,funcname,value):
-        super().__init__(f"Unable to find argument '{value}' in function '{funcname}'")
+    def __init__(self,func_name,value):
+        super().__init__(f"Unable to find argument '{value}' in function '{func_name}'")
 
 class KwargsUndefinedException(Exception):
     '''
     Exception while : Typevalidation
     For Kwargs matching
     '''
-    def __init__(self,funcname,lackBucket):
-        super().__init__(f"Arguments not defined in decorator of function {funcname} : {lackBucket}")
+    def __init__(self,func_name,lack_Bucket):
+        super().__init__(f"Arguments not defined in decorator of function {func_name} : {lack_Bucket}")
 
 '''
 //// parameter ////
@@ -54,11 +54,11 @@ class ParameterDefinitionCounterUnmatchedException(Exception):
 
 class UnableToCheckRequiredFieldException(Exception):
 
-    def __init__(self,mode,functionname,require_parameters=None):
+    def __init__(self,mode,function_name,require_parameters=None):
         if mode == Mode.STRICT:
-            self.msg = f"{mode} : Some required parameter field were not given in function '{functionname}'"
+            self.msg = f"{mode} : Some required parameter field were not given in function '{function_name}'"
         else:
-            self.msg = f"{mode} : Some parameters require to check were not given in function '{functionname}'\nRequire Parameter : {','.join(require_parameters)}"
+            self.msg = f"{mode} : Some parameters require to check were not given in function '{function_name}'\nRequire Parameter : {','.join(require_parameters)}"
         super().__init__(self.msg)
 
 class ParameterTypeUnmatchedException(Exception):
@@ -81,5 +81,5 @@ class ValidatorTypeInvalid(Exception):
         super().__init__("Unable to judge validator type. Please use 'Sequence' type or 'Key-Value'")
 
 class VardictArgmentNotDefined(Exception):
-    def __init__(self,argname,functionname):
-        super().__init__(f"Variadic argument type '{argname}' not declared but give as input in function '{functionname}'")
+    def __init__(self,arg_name,function_name):
+        super().__init__(f"Variadic argument type '{arg_name}' not declared but give as input in function '{function_name}'")

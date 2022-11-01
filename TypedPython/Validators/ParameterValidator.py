@@ -6,11 +6,11 @@ from TypedPython.Validators.Validation import Validation
 from TypedPython.Exceptions.Exceptions import *
 from TypedPython.Modes.MSGS import MSGS
 
-class ParameterValidator(Validation):
-    def __init__(self, *args, strictCheck: bool = True, isTypeMethod=False, **kwargs):
-        super(ParameterValidator, self).__init__()
-        self.isMethod = isTypeMethod
-        self.strictCheck = strictCheck
+class parameter_validator(Validation):
+    def __init__(self, *args, strict_check: bool = True, is_type_method=False, **kwargs):
+        super(parameter_validator, self).__init__()
+        self.isMethod = is_type_method
+        self.strictCheck = strict_check
         self.modename = Mode.STRICT if self.strictCheck else Mode.NON_STRICT
         self.validationTypes = args
         self.individualTypes = kwargs
@@ -61,7 +61,7 @@ class ParameterValidator(Validation):
 
             function_arguments = function_arguments if not self.isMethod else function_arguments[1:]
             # get parameter list with default value
-            nullable_param = self.getParameterListWithDefaultDictionary(parameter_info)
+            nullable_param = self.get_parameter_list_with_default_dictionary(parameter_info)
             # get parameter that is required
             not_nullable_param = list(set(function_arguments).difference(set(nullable_param)))
             # # If it's method remove 'self' from not nullable param
@@ -144,7 +144,7 @@ class ParameterValidator(Validation):
             /////////////////////////
             '''
 
-            def validateVardictArgumentDefinition():
+            def validate_vardict_argument_definition():
                 # Check varradict argument(args, kwargs)
                 # args checking : after variable of function parameter field
                 check_args = args_cpy[len(function_arguments):]
@@ -163,14 +163,14 @@ class ParameterValidator(Validation):
                     raise VardictArgmentNotDefined('kwargs', function.__name__)
 
             def type_none():
-                validateVardictArgumentDefinition()
+                validate_vardict_argument_definition()
                 if self._level == Mode.DEBUG:
                     if not_nullable_param:
                         MSGS.warning_nonsafe(function.__name__,len(not_nullable_param),len(not_nullable_param))
                     else:
                         MSGS.success_successmsg(function.__name__)
 
-            def type_Args():
+            def type_args():
 
                 # Some arguments given as kwargs
                 kwargs_key_in_parameter = list(
@@ -238,7 +238,7 @@ class ParameterValidator(Validation):
                         for key,type in getIndexOfKwargsParameter:
                             validation_capsule.append([type,kwargs[key]])
 
-                validateVardictArgumentDefinition()
+                validate_vardict_argument_definition()
                 self.validation(validation_capsule)
 
                 if self._level == Mode.DEBUG:
@@ -254,7 +254,7 @@ class ParameterValidator(Validation):
                         else:
                             MSGS.warning_nonsafe(function.__name__,len(not_nullable_param),len(not_nullable_but_not_checked))
 
-            def type_Kwargs():
+            def type_kwargs():
                 # Get field list of parameter that exist in kwargs
                 kwargs_key_in_parameter = list(
                     filter(
@@ -299,7 +299,7 @@ class ParameterValidator(Validation):
                         else:
                             validation_capsule.append([self.parameter_Preprocess[k][Field.TYPE],kwargs[k]])
 
-                validateVardictArgumentDefinition()
+                validate_vardict_argument_definition()
                 self.validation(validation_capsule)
 
                 if self._level == Mode.DEBUG:
@@ -319,8 +319,8 @@ class ParameterValidator(Validation):
                 '''
             by_type = {
                 'none' : type_none,
-                'args' : type_Args,
-                'kwargs' : type_Kwargs
+                'args' : type_args,
+                'kwargs' : type_kwargs
             }
             by_type[self.type]()
             return function(*args, **kwargs)

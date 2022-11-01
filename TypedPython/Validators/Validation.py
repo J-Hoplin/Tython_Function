@@ -19,8 +19,8 @@ class Validation(object):
         raise ConfigurationOptionNotSupported(mode.lower())
 
 
-    def validation(self,validationbucket):
-        for require, value in validationbucket:
+    def validation(self,validation_bucket):
+        for require, value in validation_bucket:
             # For multiple type utilities (ex : Union)
             if '__args__' in vars(require):
                 if not type(value) in vars(require)['__args__']:
@@ -29,7 +29,7 @@ class Validation(object):
             elif not type(value) is require:
                 raise ParameterTypeUnmatchedException(require,value)
 
-    def getParameterListWithDefaultDictionary(self,info:inspect.signature):
+    def get_parameter_list_with_default_dictionary(self,info:inspect.signature):
         return list(
             map(
                 lambda x:x.name,
