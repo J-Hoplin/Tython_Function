@@ -63,13 +63,13 @@ def test_5():
     This decorator only support type
     '''
     with pytest.raises(TypeError):
-        example_insatnce.selectiveargtest(10, 20)
+        example_insatnce.selective_argtest(10, 20)
 
 def test_6():
     '''
     selective args type test
     '''
-    assert example_insatnce.selectiveargtest(10,20,30,40,50) == pass_phrase
+    assert example_insatnce.selective_argtest(10,20,30,40,50) == pass_phrase
 
 def test_7():
     '''
@@ -87,4 +87,4 @@ def test_9():
     '''
     selective kwargs type test3
     '''
-    assert example_insatnce.selectivekwargstest(ex = 10,ex1 = 30) == pass_phrase
+    assert example_insatnce.selective_kwargstest(ex = 10,ex1 = 30) == pass_phrase

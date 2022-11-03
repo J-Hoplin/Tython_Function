@@ -24,10 +24,10 @@ git clone https://github.com/J-hoplin1/Tython_Function.git
 2. Import Decorator Class
 
 ```python
-from TypedPython.Validators.ParameterValidator import ParameterValidator
+from TypedPython.Validators.ParameterValidator import parameter_validator
 
 # Configurate mode(Set default as 'debug') : 'debug' or 'production'
-ParameterValidator.config('debug')
+parameter_validator.config('debug')
 ```
 
 - Validator의 mode를 지정해줄 수 있습니다. Default모드는 `debug` 모드입니다. 만약 Default상태로 사용하고 싶은 경우에는, `config()`함수를 호출할 필요가 없습니다. 모드로는 `debug`, `production` 두가지 모드가 있습니다. 
@@ -40,7 +40,7 @@ Validator에는 두가지 타입이 있습니다. `Sequence` 타입과 `Key-Valu
 #Console
 #Potential warning : Some arguments are not-nullable but not enrolled in validator's decorator of function 'example_function' - Not nullable : 4 / Not checked counter : 4
 #10 abc defg [1, 2, 3, 4, 5]
-@ParameterValidator()
+@parameter_validator()
 def example_function(a,b,c,d):
     print(a,b,c,d)
 
@@ -62,7 +62,7 @@ import pandas as pd
 #Columns: []
 #Index: []
 
-@ParameterValidator(int,str,Union[int,str,list],pd.DataFrame)
+@parameter_validator(int,str,Union[int,str,list],pd.DataFrame)
 def example_function(a,b,c,d):
     print(a,b,c,d)
 
@@ -76,7 +76,7 @@ from typing import Union
 #Potential warning : Some arguments are not-nullable but not enrolled in validator's decorator of function 'example_function' - Not nullable : 4 / Not checked counter : 2
 #10 abc [1, 2, 3] [10, 11, 12]
 
-@ParameterValidator(int,str,strictCheck=False)
+@parameter_validator(int,str,strictCheck=False)
 def example_function(a,b,c,d):
     print(a,b,c,d)
 
@@ -89,7 +89,7 @@ from typing import Union
 #Console
 #Success to validate parameter types of function 'example_function'
 #10 abc [1, 2, 3] [10, 11, 12]
-@ParameterValidator(a=int,c=Union[int,str,list],b=str,d=list)
+@parameter_validator(a=int,c=Union[int,str,list],b=str,d=list)
 def example_function(a,b,c,d):
     print(a,b,c,d)
 
@@ -100,7 +100,7 @@ example_function(10,'abc',[1,2,3],[10,11,12])
 from typing import Union
 
 # Console : Potential warning : Some arguments are not-nullable but not enrolled in validator's decorator of function 'example_function' - Not nullable : 4 / Not checked counter : 2
-@ParameterValidator(a=int,d=Union[int,str,list],strictCheck=False)
+@parameter_validator(a=int,d=Union[int,str,list],strictCheck=False)
 def example_function(a,b,c,d):
     print(a,b,c,d)
 
@@ -117,10 +117,10 @@ git clone https://github.com/J-hoplin1/Tython_Function.git
 2. Import Decorator Class
 
 ```python
-from TypedPython.Validators.ParameterValidator import ParameterValidator
+from TypedPython.Validators.ParameterValidator import parameter_validator
 
 # Configurate mode(Set default as 'debug') : 'debug' or 'production'
-ParameterValidator.config('debug')
+parameter_validator.config('debug')
 ```
 
 - Validator의 mode를 지정해줄 수 있습니다. Default모드는 `debug` 모드입니다. 만약 Default상태로 사용하고 싶은 경우에는, `config()`함수를 호출할 필요가 없습니다. 모드로는 `debug`, `production` 두가지 모드가 있습니다. 
@@ -143,7 +143,7 @@ class Person(object):
 
 class example_class(object):
 
-    @ParameterValidator(int,str,Person,isTypeMethod=True)
+    @parameter_validator(int,str,Person,isTypeMethod=True)
     def example_method(self,a,b,c):
         print(a,b,c)
 
@@ -167,7 +167,7 @@ class Person(object):
 
 class example_class(object):
 
-    @ParameterValidator(int,str,strictCheck=False,isTypeMethod=True)
+    @parameter_validator(int,str,strictCheck=False,isTypeMethod=True)
     def example_method(self,a,b,c):
         print(a,b,c)
 
@@ -188,7 +188,7 @@ class Person(object):
 
 class example_class(object):
 
-    @ParameterValidator(c=Person,a=int,b=str,isTypeMethod=True)
+    @parameter_validator(c=Person,a=int,b=str,isTypeMethod=True)
     def example_method(self,a,b,c):
         print(a,b,c)
 
@@ -209,7 +209,7 @@ class Person(object):
 
 class example_class(object):
 
-    @ParameterValidator(b=Person,strictCheck=False,isTypeMethod=True)
+    @parameter_validator(b=Person,strictCheck=False,isTypeMethod=True)
     def example_method(self,a,b,c=30):
         print(a,b,c)
 
